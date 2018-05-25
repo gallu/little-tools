@@ -3,6 +3,7 @@
 /**
  * PHPファイル群で「どの関数がどれくらい使われているか」の解析用ツール
  */
+// XXX 現在「ディレクトリ指定」のみだなぁ。「１ファイル指定」でも動くように少し作り変えよう
 
 // ごく軽くチェック
 if (false === isset($argv[1])) {
@@ -19,6 +20,7 @@ if (false === is_readable($base_path)) {
 
 // データ集計用領域の確保
 $data = [];
+$global = 0;
 
 // 使う配列各種
 $target_ex = [
@@ -51,6 +53,8 @@ $obj = new RecursiveIteratorIterator(
             | FilesystemIterator::KEY_AS_PATHNAME
         )
     );
+
+
 foreach($obj as $filename => $file_obj){
     // XXX いったん、拡張子は .php と .inc のみを扱う
     if (false === isset($target_ex[$file_obj->getExtension()])) {
@@ -64,6 +68,7 @@ foreach($obj as $filename => $file_obj){
     $flg = false;
     foreach($tokens as $token) {
         if (true === is_array($token)) {
+            //  使用関数のカウント
             if (T_STRING === $token[0]) {
                 // functionまたはclassとして存在するならカウント
                 if (true === function_exists($token[1])) {
@@ -74,6 +79,10 @@ foreach($obj as $filename => $file_obj){
                     @$data["cm:{$token[1]}"] ++;
                 }
             }
+            // globalのカウント
+           if ( (T_GLOBAL === $token[0])||( (T_VARIABLE === $token[0])&&('$GLOBALS' === $token[1]) ) ) {
+               $global ++;
+           }
         }
     }
 }
@@ -81,5 +90,8 @@ foreach($obj as $filename => $file_obj){
 arsort($data);
 
 // おおざっぱに出力
+echo "use function\n";
 var_dump($data);
+echo "\nuse global\n";
+var_dump($global);
 
