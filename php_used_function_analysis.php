@@ -20,7 +20,8 @@ if (false === is_readable($base_path)) {
 
 // データ集計用領域の確保
 $data = [];
-$global = 0;
+$global_1 = 0;
+$global_2 = 0;
 
 // 使う配列各種
 $target_ex = [
@@ -80,8 +81,11 @@ foreach($obj as $filename => $file_obj){
                 }
             }
             // globalのカウント
-           if ( (T_GLOBAL === $token[0])||( (T_VARIABLE === $token[0])&&('$GLOBALS' === $token[1]) ) ) {
-               $global ++;
+           if (T_GLOBAL === $token[0]) {
+               $global_1 ++;
+           }
+           if ( (T_VARIABLE === $token[0])&&('$GLOBALS' === $token[1]) ) {
+               $global_2 ++;
            }
         }
     }
@@ -93,5 +97,6 @@ arsort($data);
 echo "use function\n";
 var_dump($data);
 echo "\nuse global\n";
-var_dump($global);
+var_dump($global_1);
+var_dump($global_2);
 
