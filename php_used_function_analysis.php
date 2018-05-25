@@ -47,14 +47,26 @@ $magic_methods = [
 ];
 
 // ファイル群の取得とぶん回し
-$obj = new RecursiveIteratorIterator(
-    new RecursiveDirectoryIterator($base_path, 
-            FilesystemIterator::CURRENT_AS_FILEINFO
-            | FilesystemIterator::SKIP_DOTS
-            | FilesystemIterator::KEY_AS_PATHNAME
-        )
-    );
-
+try {
+    // ディレクトリを指定された時(一応、こっちが本義)
+    if (true === is_dir($base_path)) {
+        $obj = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($base_path, 
+                    FilesystemIterator::CURRENT_AS_FILEINFO
+                    | FilesystemIterator::SKIP_DOTS
+                    | FilesystemIterator::KEY_AS_PATHNAME
+                )
+            );
+    } else {
+        // ファイル名を指定された時(一旦、場当たり)
+        $obj = [];
+        $obj[$base_path] = new SplFileInfo($base_path);
+    }
+} catch(Exception $e) {
+    echo get_class($e), "\n";
+    echo $e->getMessage(), "\n";
+    exit;
+}
 
 foreach($obj as $filename => $file_obj){
     // XXX いったん、拡張子は .php と .inc のみを扱う
