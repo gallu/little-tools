@@ -1,6 +1,8 @@
 <?php
+declare(strict_types=1);
+error_reporting(-1);
 
-function check_ssl_certificate_lifespan($domain)
+function check_ssl_certificate_lifespan(string $domain)
 {
     // XXX 細かいdomainチェックはしていない。必要なら適宜追加で
 
