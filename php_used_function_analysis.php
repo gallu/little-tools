@@ -59,6 +59,23 @@ $magic_methods = [
     '__unserialize' => 1,
 ];
 
+//
+$language_constructs = [
+    T_ECHO => 'echo',
+    T_EMPTY => 'empty',
+    T_EVAL => 'eval',
+    T_EXIT => 'exit',
+    T_GOTO => 'goto',
+    T_INCLUDE => 'include',
+    T_INCLUDE_ONCE => 'include_once',
+    T_ISSET => 'isset',
+    T_LIST => 'list',
+    T_PRINT => 'print',
+    T_REQUIRE => 'require',
+    T_REQUIRE_ONCE => 'require_once',
+    T_UNSET => 'unset',
+];
+
 // ファイル群の取得とぶん回し
 try {
     // ディレクトリを指定された時(一応、こっちが本義)
@@ -101,7 +118,10 @@ foreach($obj as $filename => $file_obj){
     foreach($tokens as $token) {
         if (true === is_array($token)) {
             //  使用関数のカウント
-            if (T_STRING === $token[0]) {
+            if (true === isset($language_constructs[$token[0]])) {
+                // 「関数のように見える言語構造」なら、その名称でカウント
+                @$data["lc:{$language_constructs[$token[0]]}"] ++;
+            } elseif (T_STRING === $token[0]) {
                 // 関数名とクラス名は「大文字小文字を区別しない」ので小文字でそろえておく
                 $s = strtolower($token[1]);
 
